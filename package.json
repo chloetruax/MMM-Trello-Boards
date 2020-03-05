@@ -1,0 +1,11 @@
+{
+  "name": "mmm-habitica-todos",
+  "version": "1.0.0",
+  "description": "Magic Mirror Module for tracking your todos in Habitica",
+  "main": "MMM-Habitica-Todos.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Mike Truax",
+  "license": "ISC"
+}

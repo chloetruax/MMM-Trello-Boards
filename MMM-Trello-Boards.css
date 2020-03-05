@@ -1,0 +1,58 @@
+.green{
+    background-color: rgba(36, 204, 143, .5);
+}
+
+.light-blue{
+    background-color: rgba(59, 202, 215, .5);
+}
+
+.yellow{
+    background-color: rgba(255, 190, 93, .5);
+}
+
+.orange{
+    background-color: rgba(255, 148, 76, .5);
+}
+
+.red{
+    background-color: rgba(255, 97, 101, .5);
+}
+
+.dark-red{
+    background-color: rgba(222, 63, 63, .5);
+}
+
+.habitica-wrapper{
+    width: 300px;
+}
+
+.habitica-todo-container{
+    padding: 1px;
+    border: .5px solid #3a3267;
+    border-radius: 3px;
+    margin: 1px 0;
+    width: 300px;
+}
+
+.habitica-todo-title{
+    text-align: center;
+    font-size: 17px;
+    line-height: 17px;
+}
+
+.habitica-todo-note{
+    text-align: center;
+    font-size: 10px;
+    line-height: 10px;
+}
+
+.habitica-title{
+    font-size: 20px;
+    text-align: center;
+    line-height: 20px;
+}
+.habitica-todo-date{
+    font-size: 12px;
+    line-height: 12px;
+    text-align: center;
+}
