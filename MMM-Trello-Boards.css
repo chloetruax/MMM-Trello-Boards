@@ -1,3 +1,5 @@
+@import "./node_modules/font-awesome/css/font-awesome.min.css";
+
 .green{
     background-color: rgba(36, 204, 143, .5);
 }

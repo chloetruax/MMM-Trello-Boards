@@ -21,6 +21,7 @@
   },
   "homepage": "https://github.com/miketruax/MMM-Trello-Boards#readme",
   "dependencies": {
+    "font-awesome": "^4.7.0",
     "moment": "^2.24.0"
   }
 }
