@@ -1,6 +1,8 @@
+const moment = require("moment");
+
 /* global Module */
 /* Magic Mirror
- * Module: MM Habitica Todos
+ * Module: MM Trello Boards
  *
  * By Mike Truax
  * MIT Licensed.
@@ -14,21 +16,22 @@ Module.register("MMM-Trello-Boards", {
         token: null,
         sortByDueDate: true, // DESC
         boardIDs: [],
+        showDueDate: true,
         excludedListIDs: [],
-        showChecklists: true
+        showChecklists: true,
+        allowScrolling: true,
+        scrollSpeed: 30
     },
     boards: [],
     // Define start sequence.
     start: function () {
         Log.info("Starting module:" + this.name);
         if (!this.config.apiKey || !this.config.token) {
-            this.boards = [{ text: "API Key and Token are required" }]
+            this.boards = [{ name: "API Key and Token are required", lists: []}]
             return this.updateDom();
         }
-
-        this.config.sortByDueDate = this.config.sortByDueDate || this.defaults.sortByDueDate;
-        this.config.showChecklists = this.config.showChecklists || this.defaults.showChecklists;
-        this.config.excludedListIDs = this.config.excludedListIDs || this.defaults.defaults.excludedListIDs;
+        this.setDefaults();
+        
         this.boardIDs.forEach(id => this.getBoards(id))
     },
     getStyles: function () {
@@ -37,7 +40,12 @@ Module.register("MMM-Trello-Boards", {
     // Override dom generator.
     getDom: function () {
         let wrapper = document.createElement("div");
-        wrapper.classList.add("habitica-wrapper");
+        wrapper.classList.add("trello-wrapper");
+        
+        this.boards.forEach( board =>{
+            this.buildBoard(board)
+        })
+        
         let title = document.createElement("div");
         title.classList.add("habitica-title");
         title.innerText = "Habitica Todos";
@@ -64,23 +72,34 @@ Module.register("MMM-Trello-Boards", {
         })
         return wrapper;
     },
+    setDefaults(){
+        this.config.scrollSpeed = this.config.scrollSpeed || this.defaults.scrollSpeed;
+        this.config.allowScrolling = this.config.allowScrolling || this.defaults.allowScrolling;
+        this.config.sortByDueDate = this.config.sortByDueDate || this.defaults.sortByDueDate;
+        this.config.showDueDate = this.config.showDueDate || this.defaults.showDueDate;
+        this.config.showDueDate = this.config.showDueDate || this.defaults.showDueDate;
+        this.config.showChecklists = this.config.showChecklists || this.defaults.showChecklists;
+        this.config.excludedListIDs = this.config.excludedListIDs || this.defaults.defaults.excludedListIDs;
+    },
     buildBoard(elClass, text = "") {
         let el = document.createElement("div");
+        let header = document.createElement("h2")
         el.innerText = text;
         el.classList.add(elClass);
         return el;
     },
     getBoards(id) {
+        let self = this
         fetch(`https://api.trello.com/1/boards/${id}?cards=all&checklists=all&fields=name&lists=open&key=${this.config.apiKey}&token=${this.config.token}`)
             .then(res => res.json())
             .then(board => {
-                this.formatBoardObject(board);
+                self.formatBoardObject(board);
             })
     },
     formatBoardObject(board) {
         // starts up board info with minimal data
         let newBoard = { name: board.name };
-
+        let self = this;
         // loops through the cards and organizes them into objects based off the list. 
         // This will help reduce the need to filter cards multiple times for lists later
         // This also pushes the needed checklists into the cards if they're needed
@@ -99,11 +118,11 @@ Module.register("MMM-Trello-Boards", {
         }
         
         groupedCards = groupedCards.reduce((acc, current) => {
-            if (!this.config.excludedListIDs.includes(current.idList)) {
-                let trimmed = this.trimCard(current)
-                if (this.config.showChecklists && current.idChecklists.length > 0) {
+            if (!self.config.excludedListIDs.includes(current.idList)) {
+                let trimmed = self.trimCard(current)
+                if (self.config.showChecklists && current.idChecklists.length > 0) {
                     let checkLists = board.checklists.filter(cl => cl.idCard === current.id);
-                    trimmed.checkLists = this.trimChecklist(checkLists);
+                    trimmed.checkLists = self.trimChecklist(checkLists);
                 }
                 if (acc[`_${trimmed.idList}`]) {
                     acc[`_${trimmed.idList}`].push(trimmed)
@@ -114,7 +133,7 @@ Module.register("MMM-Trello-Boards", {
             }
             return acc
         }, {});
-        let lists = board.lists.filter(l => !this.config.excludedListIDs.includes(l.id));
+        let lists = board.lists.filter(l => !self.config.excludedListIDs.includes(l.id));
         
         lists = lists.map(list=> {
             return {
@@ -144,23 +163,21 @@ Module.register("MMM-Trello-Boards", {
     },
     // Strips out only the needed pieces of the cards, mostly used to rename some keys and move everything to the top level
     trimCard(card) {
+        let self = this;
         return {
             id: card.id,
             name: card.name,
             idList: card.idList,
-            due: card.due,
+            due: self.formatDate(card.due),
             idChecklists: card.idChecklists,
             itemsToCheck: card.checkItems,
             itemsChecked: card.checkItemsChecked
         }
     },
 
-    // Listen.. I know moment.js is awesome and I use it a ton. I just really don't feel like adding a single module to this project.
+    // Utilizes moment.js to allow for easier string building of due dates
     formatDate(date) {
-        let todoDate = new Date(date);
-        let month = format(todoDate.getMonth() + 1);
-        let day = format(todoDate.getDate());
-        let year = format(todoDate.getFullYear());
-        return month + "/" + day + "/" + year;
+        let dateObj = new Date(date)
+        return moment(dateObj).format('MMM Do YYYY')
     }
 });
