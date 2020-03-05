@@ -39,39 +39,19 @@ Module.register("MMM-Trello-Boards", {
     },
     // Override dom generator.
     getDom: function () {
+        // <i class="far fa-check-square"></i> Checked
+        // <i class="far fa-square"></i> Unchecked
+        let self = this;
         let wrapper = document.createElement("div");
         wrapper.classList.add("trello-wrapper");
         
+        // Builds each board one at a time
         this.boards.forEach( board =>{
-            this.buildBoard(board)
-        })
-        
-        let title = document.createElement("div");
-        title.classList.add("habitica-title");
-        title.innerText = "Habitica Todos";
-        wrapper.appendChild(title);
-        if (!this.todos) {
-            return wrapper;
-        }
-        let self = this;
-        this.todos.forEach(todo => {
-            let todoCont = self.buildTodoEl("habitica-todo-container")
-            todoCont.classList.add(this.getTodoClass(todo.value));
-            let title = self.buildTodoEl("habitica-todo-title", todo.text);
-            todoCont.appendChild(title);
-            if (self.config.showDueDate) {
-                let formattedDate = self.formatTodoDate(todo.date)
-                let date = self.buildTodoEl("habitica-todo-date", formattedDate)
-                todoCont.appendChild(date);
-            }
-            if (todo.notes && self.config.showNotes) {
-                let note = self.buildTodoEl("habitica-todo-note", todo.notes)
-                todoCont.appendChild(note);
-            }
-            wrapper.appendChild(todoCont);
+            wrapper.append(self.buildBoard(board))
         })
         return wrapper;
     },
+
     setDefaults(){
         this.config.scrollSpeed = this.config.scrollSpeed || this.defaults.scrollSpeed;
         this.config.allowScrolling = this.config.allowScrolling || this.defaults.allowScrolling;
@@ -82,12 +62,19 @@ Module.register("MMM-Trello-Boards", {
         this.config.excludedListIDs = this.config.excludedListIDs || this.defaults.defaults.excludedListIDs;
     },
     buildBoard(elClass, text = "") {
+        // Create Board Element and Heading
         let el = document.createElement("div");
         let header = document.createElement("h2")
-        el.innerText = text;
-        el.classList.add(elClass);
+        
+        // TODO Create List Items One at a Time
+        
+            // TODO Creates Cards for each list
+
+                // TODO Create Checklist Items for Cards
+                
         return el;
     },
+
     getBoards(id) {
         let self = this
         fetch(`https://api.trello.com/1/boards/${id}?cards=all&checklists=all&fields=name&lists=open&key=${this.config.apiKey}&token=${this.config.token}`)
