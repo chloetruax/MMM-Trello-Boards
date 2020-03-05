@@ -12,7 +12,7 @@ Module.register("MMM-Trello-Boards", {
     defaults: {
         apiKey: null,
         token: null,
-        overDueToTop: true, // DESC
+        sortByDueDate: true, // DESC
         boardIDs: [],
         excludedListIDs: [],
         showChecklists: true
@@ -26,7 +26,7 @@ Module.register("MMM-Trello-Boards", {
             return this.updateDom();
         }
 
-        this.config.overDueToTop = this.config.overDueToTop || this.defaults.overDueToTop;
+        this.config.sortByDueDate = this.config.sortByDueDate || this.defaults.sortByDueDate;
         this.config.showChecklists = this.config.showChecklists || this.defaults.showChecklists;
         this.config.excludedListIDs = this.config.excludedListIDs || this.defaults.defaults.excludedListIDs;
         this.boardIDs.forEach(id => this.getBoards(id))
@@ -85,7 +85,20 @@ Module.register("MMM-Trello-Boards", {
         // This will help reduce the need to filter cards multiple times for lists later
         // This also pushes the needed checklists into the cards if they're needed
 
-        let groupedCards = board.cards.reduce((acc, current) => {
+        let groupedCards = board.cards;
+        if(this.config.sortByDueDate){
+            groupedCards = groupedCards.sort((a,b) => {
+                if(a.due == null){
+                return 1
+                }
+                if(b.due == null){
+                return -1
+                }
+                return a.due - b.due
+              })
+        }
+        
+        groupedCards = groupedCards.reduce((acc, current) => {
             if (!this.config.excludedListIDs.includes(current.idList)) {
                 let trimmed = this.trimCard(current)
                 if (this.config.showChecklists && current.idChecklists.length > 0) {
@@ -141,16 +154,9 @@ Module.register("MMM-Trello-Boards", {
             itemsChecked: card.checkItemsChecked
         }
     },
-    getTodoClass(val) {
-        if (val >= 12) return "bright-blue";
-        if (val >= 6) return "light-blue";
-        if (val > 0) return "green";
-        if (val == 0) return 'yellow';
-        if (val > -9) return 'orange'
-        if (val >= -16) return 'red';
-        return 'dark-red'
-    },
-    formatTodoDate(date) {
+
+    // Listen.. I know moment.js is awesome and I use it a ton. I just really don't feel like adding a single module to this project.
+    formatDate(date) {
         let todoDate = new Date(date);
         let month = format(todoDate.getMonth() + 1);
         let day = format(todoDate.getDate());

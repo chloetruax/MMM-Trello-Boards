@@ -1,5 +1,5 @@
 {
-  "name": "mmm-habitica-todos",
+  "name": "mmm-trello-boards",
   "version": "1.0.0",
   "description": "Magic Mirror Module for tracking your todos in Habitica",
   "main": "MMM-Habitica-Todos.js",
@@ -7,5 +7,20 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Mike Truax",
-  "license": "ISC"
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/miketruax/MMM-Trello-Boards.git"
+  },
+  "keywords": [
+    "MagicMirror",
+    "Trello"
+  ],
+  "bugs": {
+    "url": "https://github.com/miketruax/MMM-Trello-Boards/issues"
+  },
+  "homepage": "https://github.com/miketruax/MMM-Trello-Boards#readme",
+  "dependencies": {
+    "moment": "^2.24.0"
+  }
 }
